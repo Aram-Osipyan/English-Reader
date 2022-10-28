@@ -38,15 +38,15 @@ class BookRepository{
      * @returns {Promise<void>}
      */
     async add(name, text, author){
-            await setDoc(doc(this._db, this._databasePath,`${this._authenticator.getUser().uid}`), {
-               uid: this._authenticator.getUser().uid,
-            });
-            const docRef = await addDoc(collection(this._db, this._databasePath, this._authenticator.getUser().uid,`books`), {
-                name: name,
-                text: text,
-                author: author,
-            });
-            console.log("Document written with ID: ", docRef.id);
+        await setDoc(doc(this._db, this._databasePath,`${this._authenticator.getUser().uid}`), {
+           uid: this._authenticator.getUser().uid,
+        });
+        const docRef = await addDoc(collection(this._db, this._databasePath, this._authenticator.getUser().uid,`books`), {
+            name: name,
+            text: text,
+            author: author,
+        });
+        console.log("Document written with ID: ", docRef.id);
     }
 
     async delete(bookId){
