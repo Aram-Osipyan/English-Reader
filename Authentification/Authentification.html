@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <link rel="stylesheet" href="Authentification.css">
+</head>
+<body>
+<div class="columns is-multiline is-flex is-vcentered is-fullheight">
+    <div class="card auth-card column is-4 is-offset-4">
+        <div class="field">
+            <p class="control has-icons-left has-icons-right">
+                <input class="input" type="email" placeholder="Email" id="email">
+                <span class="icon is-small is-left">
+                    <i class="fas fa-envelope"></i>
+                </span>
+                <span class="icon is-small is-right">
+                    <i class="fas fa-check" id="emailRightI"></i>
+                </span>
+            </p>
+
+
+        </div>
+        <div class="field">
+            <p class="control has-icons-left">
+                <input class="input" type="password" placeholder="Password" id="password">
+                <span class="icon is-small is-left">
+            <i class="fas fa-lock"></i>
+          </span>
+            </p>
+        </div>
+        <div class="field is-grouped">
+            <div class="control">
+                <button class="button is-link" id="createAccount">Create Account</button>
+            </div>
+            <div class="control">
+                <button class="button is-link" id="signIn">Sign In</button>
+            </div>
+        </div>
+        <div id="emailLogText">
+
+        </div>
+    </div>
+</div>
+
+
+  <script src="Authentification.js" type="module"></script>
+</body>
+</html>
