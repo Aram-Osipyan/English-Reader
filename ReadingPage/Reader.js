@@ -13,6 +13,7 @@ function generateReader(text){
             elem.classList.add('dropdown');
             const dropdown_trigger = document.createElement('div');
             dropdown_trigger.classList.add('dropdown-trigger');
+
             const button = document.createElement('div');
             button.classList.add('button', 'is-inverted', 'is-primary');
             button.setAttribute('aria-haspopup', 'true');
@@ -25,8 +26,6 @@ function generateReader(text){
             dropdown_trigger.appendChild(button);
             elem.appendChild(dropdown_trigger);
 
-
-
             const dropdown_menu = document.createElement('div');
             dropdown_menu.classList.add('dropdown-menu');
             dropdown_menu.setAttribute('role', 'menu');
@@ -37,7 +36,7 @@ function generateReader(text){
             const dropdown_item = document.createElement('div');
             dropdown_item.classList.add('dropdown-item');
 
-            dropdown_item.appendChild(generateDropdownContent(x))
+            //dropdown_item.appendChild(generateDropdownContent(x))
             dropdown_content.appendChild(dropdown_item);
             dropdown_menu.appendChild(dropdown_content);
             elem.appendChild(dropdown_menu);
@@ -48,13 +47,15 @@ function generateReader(text){
 
             button.onclick = async function (){
                 elem.classList.toggle('is-active',elem.classList.length !== 2);
-                const translator = new WordTranslator();
-                const translation = await translator.translate(x);
-                console.log(translation);
-                const p = document.createElement('p');
-                p.innerText = translation.def[0].tr[0].text;
-                dropdown_item.appendChild(p);
+                const content = await generateTranslationContent(x);
+                dropdown_item.innerHTML = '';
+                dropdown_item.appendChild(content);
+                const addToDicBtn = document.createElement('button');
+                addToDicBtn.classList.add('button');
+                addToDicBtn.setAttribute('style', 'background-color:#D3D3D3;');
+                addToDicBtn.innerText = 'add';
 
+                dropdown_item.appendChild(addToDicBtn);
                 //dropdown_item.appendChild()
                 //console.log();
                 console.log('x', x)
@@ -63,11 +64,15 @@ function generateReader(text){
         });
 
     document.body.addEventListener('click', (event) => {
-        console.log(JSON.stringify(event));
-        //console.log(event.currentTarget.target.classList);
-        if (!event.target.classList.contains('button')){
-            for (const key of splittedText) {
-                //key.classList.remove('is-active');
+        console.log(event.target,"target");
+        if (!event.target.matches('.button')) {
+            var dropdowns = document.getElementsByClassName("dropdown");
+            var i;
+            for (i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('is-active')) {
+                    //openDropdown.classList.remove('is-active');
+                }
             }
         }
 
@@ -75,7 +80,17 @@ function generateReader(text){
     textDiv.append(...splittedText);
     console.log(splittedText);
 }
-
+async function generateTranslationContent(word){
+    const translator = new WordTranslator();
+    const translation = await translator.translate(word);
+    console.log(translation);
+    const p = document.createElement('p');
+    const translationText = translation.def[0].tr[0].text;
+    const transcriptionText = translation.def[0].ts;
+    const text = translation.def[0].text;
+    p.innerHTML =  `<b>${text}</b> [${transcriptionText}] - ${translationText}`;
+    return p;
+}
 /**
  *
  * @param word{string}

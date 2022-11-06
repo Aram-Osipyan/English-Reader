@@ -1,19 +1,17 @@
 import {FirebaseApp} from "./FirebaseApp";
 import {Authenticator} from "./Authentificator";
 import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, deleteDoc } from "firebase/firestore";
+import {getAuth} from "firebase/auth";
 
 class BookRepository{
     _app;
     _db;
-    _authenticator;
     _databasePath = "user-books";
     /**
      *
-     * @param auth {Authenticator}
      * @param app {FirebaseApp}
      */
-    constructor(auth , app) {
-        this._authenticator = auth ;
+    constructor(app) {
         this._db = getFirestore(app.getApp());
     }
 
@@ -26,7 +24,7 @@ class BookRepository{
      * @returns {Promise<Array>}
      */
     async get(){
-        const books = await getDocs(collection(this._db, this._databasePath, this._authenticator.getUser().uid, `books`));
+        const books = await getDocs(collection(this._db, this._databasePath, getAuth().currentUser.uid, `books`));
         return books.docs.map(x => this.generateBookObject(x.data(), x.id));
     }
 
@@ -38,10 +36,11 @@ class BookRepository{
      * @returns {Promise<void>}
      */
     async add(name, text, author){
-        await setDoc(doc(this._db, this._databasePath,`${this._authenticator.getUser().uid}`), {
-           uid: this._authenticator.getUser().uid,
+        const auth = getAuth();
+        await setDoc(doc(this._db, this._databasePath, auth.currentUser.uid), {
+           uid: auth.currentUser.uid,
         });
-        const docRef = await addDoc(collection(this._db, this._databasePath, this._authenticator.getUser().uid,`books`), {
+        const docRef = await addDoc(collection(this._db, this._databasePath, auth.currentUser.uid,`books`), {
             name: name,
             text: text,
             author: author,
@@ -50,7 +49,7 @@ class BookRepository{
     }
 
     async delete(bookId){
-        const docRef = doc(this._db, this._databasePath, this._authenticator.getUser().uid, `books`, bookId);
+        const docRef = doc(this._db, this._databasePath, getAuth().currentUser.uid, `books`, bookId);
         await deleteDoc(docRef);
     }
 }
