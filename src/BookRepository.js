@@ -4,6 +4,12 @@ import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, deleteD
 import {getAuth} from "firebase/auth";
 
 class BookRepository{
+
+    /**
+     *
+     * @private
+     * @type{FirebaseApp}
+     */
     _app;
     _db;
     _databasePath = "user-books";
@@ -13,6 +19,7 @@ class BookRepository{
      */
     constructor(app) {
         this._db = getFirestore(app.getApp());
+        this._app = app;
     }
 
 
@@ -24,10 +31,16 @@ class BookRepository{
      * @returns {Promise<Array>}
      */
     async get(){
-        const books = await getDocs(collection(this._db, this._databasePath, getAuth().currentUser.uid, `books`));
+        const auth = getAuth(this._app.getApp());
+        const books = await getDocs(collection(this._db, this._databasePath, auth.currentUser.uid, `books`));
         return books.docs.map(x => this.generateBookObject(x.data(), x.id));
     }
 
+    async getSingle(bookId){
+        const books = await this.get();
+        console.log('books  tt',books);
+        return books.filter(x => x.id === bookId)[0];
+    }
     /**
      *
      * @param name{string}
@@ -36,7 +49,7 @@ class BookRepository{
      * @returns {Promise<void>}
      */
     async add(name, text, author){
-        const auth = getAuth();
+        const auth = getAuth(this._app.getApp());
         await setDoc(doc(this._db, this._databasePath, auth.currentUser.uid), {
            uid: auth.currentUser.uid,
         });

@@ -9,10 +9,9 @@ class WordRepository{
     _databasePath = "user-words";
     /**
      *
-     * @param auth {Authenticator}
      * @param app {FirebaseApp}
      */
-    constructor(auth , app) {
+    constructor(app) {
         this._db = getFirestore(app.getApp());
     }
 

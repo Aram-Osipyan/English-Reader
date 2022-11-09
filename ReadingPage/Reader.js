@@ -1,6 +1,9 @@
 import {WordTranslator} from "../src/WordTranslator";
-
-const textDiv = document.getElementById('textDiv');
+import {BookRepository} from "../src/BookRepository";
+import {FirebaseApp} from "../src/FirebaseApp";
+import {WordRepository} from "../src/WordRepository";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
+import {Authenticator} from "../src/Authentificator";
 
 /**
  *
@@ -47,14 +50,22 @@ function generateReader(text){
 
             button.onclick = async function (){
                 elem.classList.toggle('is-active',elem.classList.length !== 2);
-                const content = await generateTranslationContent(x);
+                const translation = await getTranslation(x);
+                const content = await generateTranslationContent(translation);
                 dropdown_item.innerHTML = '';
                 dropdown_item.appendChild(content);
                 const addToDicBtn = document.createElement('button');
-                addToDicBtn.classList.add('button');
+                addToDicBtn.classList.add('button', 'is-primary');
                 addToDicBtn.setAttribute('style', 'background-color:#D3D3D3;');
-                addToDicBtn.innerText = 'add';
-
+                addToDicBtn.innerText = 'add to dictionary';
+                addToDicBtn.onclick = async function (){
+                    if (!addToDicBtn.classList.contains('is-loading')){
+                        addToDicBtn.classList.add('is-loading');
+                        await addToDictionary(translation);
+                        addToDicBtn.classList.remove('is-loading');
+                        elem.classList.toggle('is-active',elem.classList.length !== 2);
+                    }
+                }
                 dropdown_item.appendChild(addToDicBtn);
                 //dropdown_item.appendChild()
                 //console.log();
@@ -63,52 +74,77 @@ function generateReader(text){
             return elem;
         });
 
-    document.body.addEventListener('click', (event) => {
-        console.log(event.target,"target");
-        if (!event.target.matches('.button')) {
-            var dropdowns = document.getElementsByClassName("dropdown");
-            var i;
-            for (i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('is-active')) {
-                    //openDropdown.classList.remove('is-active');
-                }
-            }
-        }
+    return splittedText;
+}
 
-    });
-    textDiv.append(...splittedText);
-    console.log(splittedText);
-}
-async function generateTranslationContent(word){
-    const translator = new WordTranslator();
-    const translation = await translator.translate(word);
-    console.log(translation);
-    const p = document.createElement('p');
-    const translationText = translation.def[0].tr[0].text;
-    const transcriptionText = translation.def[0].ts;
-    const text = translation.def[0].text;
-    p.innerHTML =  `<b>${text}</b> [${transcriptionText}] - ${translationText}`;
-    return p;
-}
 /**
  *
- * @param word{string}
- * @returns {HTMLParagraphElement}
+ * @param translation {{transcription : string, translation : string, text : string}}
+ * @returns {Promise<HTMLParagraphElement>}
  */
-function generateDropdownContent(word){
+async function generateTranslationContent(translation){
     const p = document.createElement('p');
-    p.innerHTML = `dictionary result of <b>${word}</b>`;
+    p.innerHTML =  `<b>${translation.text}</b> [${translation.transcription}] - ${translation.translation}`;
     return p;
-
 }
-//textDiv.appendChild(document.createElement('div.classname'));
-generateReader('Lorem Ipsum is simply dummy text of the printing and typesetting industry.');
 
-const textDiv2 = document.getElementById('test');
+/**
+ *
+ * @param word {string}
+ * @returns {Promise<{transcription: *, translation, text}>}
+ */
+async function getTranslation(word){
+    const translator = new WordTranslator();
+    const translation = await translator.translate(word);
 
-const textButton = document.getElementById('testButton');
-textButton.onclick = function (){
-    console.log("log");
-    textDiv2.classList.toggle('is-active', textDiv2.classList.length === 1);
+    return {
+        translation : translation.def[0].tr[0].text,
+        transcription : translation.def[0].ts,
+        text : translation.def[0].text,
+    }
 }
+
+function getBookIdFromPath(){
+    const search = document.location.search.substring(1);
+    const params = search.split('&').map(param => {
+        const splitted = param.split('=');
+        return {key : splitted[0], value : splitted[1]};
+    });
+    const bookId = params.filter(x => x.key === 'book-id')[0];
+    console.log('bookId', bookId);
+    if (bookId !== undefined){
+        return bookId.value;
+    }
+}
+
+async function addToDictionary(translation){
+    const app = new FirebaseApp();
+    const wordRepository = new WordRepository(app);
+    await wordRepository.add(translation.text, translation.translation, translation.transcription);
+}
+
+window.onload = (event) => {
+    const bookId = getBookIdFromPath();
+    const app = new FirebaseApp();
+    const bookRepository = new BookRepository(app);
+    const auth = getAuth(app.getApp());
+    const textDiv = document.getElementById('textDiv');
+    onAuthStateChanged(auth, async (user) => {
+        if (user){
+            const book = await bookRepository.getSingle(bookId);
+            const text = generateReader(book.data.text);
+            textDiv.append(...text);
+        }
+    })
+};
+
+document.addEventListener('click', (event) => {
+    const dropdowns = document.getElementsByClassName('dropdown');
+    for (const dropdown of dropdowns) {
+        if (!event.composedPath().includes(dropdown)){
+            dropdown.classList.remove('is-active')
+        }
+    }
+})
+
+

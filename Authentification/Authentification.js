@@ -14,13 +14,17 @@ const authenticator = new Authenticator(app);
 
 reset();
 createAccountButton.onclick = function (){
+    createAccountButton.classList.add('is-loading')
     authenticator.createUserWithEmailAndPassword(email.value, password.value)
         .then(res => {
+            createAccountButton.classList.remove('is-loading')
             console.log(res,"res");
             reset();
             createSuccessText();
+            location.replace(`/index.html`)
         })
         .catch(err => {
+            createAccountButton.classList.remove('is-loading')
             console.log(`${err.message} ${err.code}`);
             email.classList.add("is-danger");
 
@@ -31,12 +35,16 @@ createAccountButton.onclick = function (){
 }
 
 signInButton.onclick = function (){
+    signInButton.classList.add('is-loading')
     authenticator.signInWithEmailAndPassword(email.value, password.value)
         .then(res => {
+            signInButton.classList.remove('is-loading')
             reset();
             createSuccessText();
+            location.replace(`/index.html`)
         })
         .catch(err => {
+            signInButton.classList.remove('is-loading')
             createEmailLog(err.code);
         });
 }
