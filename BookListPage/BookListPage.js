@@ -1,10 +1,14 @@
 import {FirebaseApp} from "../src/FirebaseApp";
-import {Authenticator} from "../src/Authentificator";
 import {BookRepository} from "../src/BookRepository";
-import {WordRepository} from "../src/WordRepository";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
+import {fetchComponent} from "../src/ComponentFetching";
+
+const header = document.getElementById('header');
+fetchComponent(header, '../NavMenu/NavMenu.html');
 
 function generateBookList(bookArray){
+    const app = new FirebaseApp();
+    const bookRepository = new BookRepository(app);
     const res = bookArray.map(book => {
         const elem = document.createElement('div');
         elem.classList.add('column', 'is-4-widescreen', 'is-6-desktop', 'mb-5', 'card');
@@ -33,6 +37,13 @@ function generateBookList(bookArray){
         }
         const deleteButton = document.createElement('a');
         deleteButton.classList.add('card-footer-item');
+        deleteButton.onclick = async function (){
+            console.log('book',book);
+            deleteButton.classList.add('is-loading');
+            await bookRepository.delete(book.id);
+            deleteButton.classList.remove('is-loading');
+            elem.remove();
+        }
         deleteButton.innerText = 'Delete';
 
         cardFooter.appendChild(readButton);

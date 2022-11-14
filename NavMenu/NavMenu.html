@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+</head>
+<body>
+<header>
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="../BookListPage/BookListPage.html">
+          Books
+        </a>
+
+        <a class="navbar-item" href="../Dictionary/Dictionary.html">
+          Dictionary
+        </a>
+
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item" id="sign-buttons">
+          <div class="buttons">
+            <a class="button is-primary" href="/Authentification/Authentification.html">
+              <strong>Sign up</strong>
+            </a>
+            <a class="button is-light" href="/Authentification/Authentification.html">
+              Log in
+            </a>
+          </div>
+        </div>
+        <div class="navbar-item" id="user-email">
+
+        </div>
+      </div>
+
+    </div>
+  </nav>
+</header>
+
+  <script type="module">
+    console.log('play')
+    import {FirebaseApp} from "../src/FirebaseApp";
+    import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+    const signButtons = document.getElementById('sign-buttons');
+    const userEmail = document.getElementById('user-email');
+    const app = new FirebaseApp();
+    const auth = getAuth(app.getApp());
+
+    onAuthStateChanged(auth, function(user) {
+      if (user) {
+        signButtons.style.display = 'none';
+        const emailText = document.createElement('p');
+        emailText.innerText = user.email;
+        userEmail.innerHTML = '';
+        userEmail.append(emailText);
+      } else {
+        signButtons.style.display = 'block';
+      }
+    });
+</script>
+</body>
+</html>

@@ -4,7 +4,10 @@ import {FirebaseApp} from "../src/FirebaseApp";
 import {WordRepository} from "../src/WordRepository";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import {Authenticator} from "../src/Authentificator";
+import {fetchComponent} from "../src/ComponentFetching";
 
+const header = document.getElementById('header');
+fetchComponent(header, '../NavMenu/NavMenu.html');
 /**
  *
  * @param text{string}
@@ -132,8 +135,11 @@ window.onload = (event) => {
     onAuthStateChanged(auth, async (user) => {
         if (user){
             const book = await bookRepository.getSingle(bookId);
-            const text = generateReader(book.data.text);
-            textDiv.append(...text);
+            if(book.data){
+                const text = generateReader(book.data.text);
+                textDiv.append(...text);
+            }
+
         }
     })
 };
