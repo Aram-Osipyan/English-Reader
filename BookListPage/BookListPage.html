@@ -9,11 +9,51 @@
 <body>
 <header id="header"></header>
 <section class="section pb-0">
+  <button class="button is-light" id="add-book-button">Add Book</button>
   <div class="container">
     <div class="columns is-desktop is-multiline" id="books-container">
+
     </div>
   </div>
 </section>
+
+<div class="modal" id="add-book-modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add Book Modal</p>
+      <button class="delete close-modal-button" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="field">
+        <label class="label">Book Name</label>
+        <div class="control">
+          <input class="input" type="text" placeholder="Text input" id="book-name">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Author</label>
+        <div class="control">
+          <input class="input" type="text" placeholder="Text input" id="book-author">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Book Text</label>
+        <div class="control">
+          <textarea class="textarea" placeholder="Textarea" id="book-text"></textarea>
+        </div>
+      </div>
+
+
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success" id="save-changes">Add Book</button>
+      <button class="button close-modal-button">Cancel</button>
+    </footer>
+  </div>
+</div>
 
 <script src="./BookListPage.js" type="module"></script>
 </body>

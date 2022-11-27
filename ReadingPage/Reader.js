@@ -132,12 +132,16 @@ window.onload = (event) => {
     const bookRepository = new BookRepository(app);
     const auth = getAuth(app.getApp());
     const textDiv = document.getElementById('textDiv');
+    const titleNode = document.getElementById('title');
+    const subtitleNode = document.getElementById('subtitle');
     onAuthStateChanged(auth, async (user) => {
         if (user){
             const book = await bookRepository.getSingle(bookId);
             if(book.data){
                 const text = generateReader(book.data.text);
                 textDiv.append(...text);
+                titleNode.innerText = book.data.name;
+                subtitleNode.innerText = book.data.author;
             }
 
         }

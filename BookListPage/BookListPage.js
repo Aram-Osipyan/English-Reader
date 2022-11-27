@@ -56,6 +56,8 @@ function generateBookList(bookArray){
 
 
 }
+
+
 window.onload = async(event) => {
     const app = new FirebaseApp();
     const bookRepository = new BookRepository(app);
@@ -67,4 +69,29 @@ window.onload = async(event) => {
             bookContainer.append(...generateBookList(bookList))
         }
     })
+
+    const addBookModal = document.getElementById('add-book-modal');
+    const addBookButton = document.getElementById('add-book-button');
+    const closeButtons = document.getElementsByClassName('close-modal-button');
+    addBookButton.onclick = function(){
+        addBookModal.classList.add('is-active');
+    }
+    for (let closeButton of closeButtons) {
+        closeButton.onclick = function(){
+            addBookModal.classList.remove('is-active');
+        }
+    }
+
+    const bookName = document.getElementById('book-name');
+    const bookAuthor = document.getElementById('book-author');
+    const bookText = document.getElementById('book-text');
+    const saveChangesButton = document.getElementById('save-changes');
+
+    saveChangesButton.onclick = async function (){
+        const app = new FirebaseApp();
+        const bookRepository = new BookRepository(app);
+
+        await bookRepository.add(bookName.value,bookText.value, bookAuthor.value);
+        addBookModal.classList.remove('is-active');
+    }
 }
